@@ -1,0 +1,91 @@
+month,department,account,account_type,budget,actual
+2026-01,Sales,Subscription Revenue,revenue,840000.0,851711.86
+2026-01,Sales,Professional Services Revenue,revenue,117000.0,111442.63
+2026-01,Sales,Salaries,expense,150000.0,146625.44
+2026-01,Sales,Commissions,expense,38000.0,36948.2
+2026-01,Sales,Travel,expense,14000.0,14331.06
+2026-01,Marketing,Paid Marketing,expense,55000.0,55971.85
+2026-01,Marketing,Salaries,expense,60000.0,62353.08
+2026-01,Marketing,Events,expense,18000.0,17256.49
+2026-01,Engineering,Salaries,expense,210000.0,208360.36
+2026-01,Engineering,Cloud Hosting,expense,48000.0,45743.03
+2026-01,Engineering,Contractors,expense,22000.0,21381.0
+2026-01,Engineering,Software Licenses,expense,12000.0,12006.43
+2026-01,G&A,Salaries,expense,70000.0,66685.75
+2026-01,G&A,Rent,expense,30000.0,29096.51
+2026-01,G&A,Software Licenses,expense,9000.0,9134.9
+2026-02,Sales,Subscription Revenue,revenue,856800.0,860650.58
+2026-02,Sales,Professional Services Revenue,revenue,119340.0,116003.74
+2026-02,Sales,Salaries,expense,153000.0,154365.76
+2026-02,Sales,Commissions,expense,38800.0,40000.59
+2026-02,Sales,Travel,expense,14300.0,13594.29
+2026-02,Marketing,Paid Marketing,expense,56100.0,57815.65
+2026-02,Marketing,Salaries,expense,61200.0,62412.61
+2026-02,Marketing,Events,expense,18400.0,18106.06
+2026-02,Engineering,Salaries,expense,214200.0,206820.37
+2026-02,Engineering,Cloud Hosting,expense,49000.0,51240.34
+2026-02,Engineering,Contractors,expense,22400.0,35840.0
+2026-02,Engineering,Software Licenses,expense,12200.0,11703.15
+2026-02,G&A,Salaries,expense,71400.0,68520.55
+2026-02,G&A,Rent,expense,30600.0,31663.33
+2026-02,G&A,Software Licenses,expense,9200.0,9295.43
+2026-03,Sales,Subscription Revenue,revenue,873600.0,900430.72
+2026-03,Sales,Professional Services Revenue,revenue,121680.0,124475.38
+2026-03,Sales,Salaries,expense,156000.0,156565.16
+2026-03,Sales,Commissions,expense,39500.0,41368.81
+2026-03,Sales,Travel,expense,14600.0,14422.66
+2026-03,Marketing,Paid Marketing,expense,57200.0,57497.67
+2026-03,Marketing,Salaries,expense,62400.0,64455.49
+2026-03,Marketing,Events,expense,18700.0,18921.63
+2026-03,Engineering,Salaries,expense,218400.0,226299.68
+2026-03,Engineering,Cloud Hosting,expense,49900.0,65868.0
+2026-03,Engineering,Contractors,expense,22900.0,23368.47
+2026-03,Engineering,Software Licenses,expense,12500.0,11932.28
+2026-03,G&A,Salaries,expense,72800.0,70819.1
+2026-03,G&A,Rent,expense,31200.0,30542.89
+2026-03,G&A,Software Licenses,expense,9400.0,9005.0
+2026-04,Sales,Subscription Revenue,revenue,890400.0,866607.70
+2026-04,Sales,Professional Services Revenue,revenue,124020.0,119071.62
+2026-04,Sales,Salaries,expense,159000.0,155469.78
+2026-04,Sales,Commissions,expense,40300.0,40846.81
+2026-04,Sales,Travel,expense,14800.0,14599.95
+2026-04,Marketing,Paid Marketing,expense,58300.0,74624.0
+2026-04,Marketing,Salaries,expense,63600.0,61752.46
+2026-04,Marketing,Events,expense,19100.0,18654.93
+2026-04,Engineering,Salaries,expense,222600.0,195888.0
+2026-04,Engineering,Cloud Hosting,expense,50900.0,51653.5
+2026-04,Engineering,Contractors,expense,23300.0,23554.28
+2026-04,Engineering,Software Licenses,expense,12700.0,12282.35
+2026-04,G&A,Salaries,expense,74200.0,75900.12
+2026-04,G&A,Rent,expense,31800.0,30729.62
+2026-04,G&A,Software Licenses,expense,9500.0,9385.48
+2026-05,Sales,Subscription Revenue,revenue,907200.0,780192.00
+2026-05,Sales,Professional Services Revenue,revenue,126360.0,128129.04
+2026-05,Sales,Salaries,expense,162000.0,162922.59
+2026-05,Sales,Commissions,expense,41000.0,41756.92
+2026-05,Sales,Travel,expense,15100.0,15617.71
+2026-05,Marketing,Paid Marketing,expense,59400.0,61039.44
+2026-05,Marketing,Salaries,expense,64800.0,63044.23
+2026-05,Marketing,Events,expense,19400.0,18492.27
+2026-05,Engineering,Salaries,expense,226800.0,222614.48
+2026-05,Engineering,Cloud Hosting,expense,51800.0,50596.9
+2026-05,Engineering,Contractors,expense,23800.0,23112.14
+2026-05,Engineering,Software Licenses,expense,13000.0,13575.78
+2026-05,G&A,Salaries,expense,75600.0,78445.34
+2026-05,G&A,Rent,expense,32400.0,31799.56
+2026-05,G&A,Software Licenses,expense,9700.0,9850.78
+2026-06,Sales,Subscription Revenue,revenue,924000.0,914356.38
+2026-06,Sales,Professional Services Revenue,revenue,128700.0,173745.00
+2026-06,Sales,Salaries,expense,165000.0,164321.06
+2026-06,Sales,Commissions,expense,41800.0,40817.2
+2026-06,Sales,Travel,expense,15400.0,15009.81
+2026-06,Marketing,Paid Marketing,expense,60500.0,60871.28
+2026-06,Marketing,Salaries,expense,66000.0,64434.09
+2026-06,Marketing,Events,expense,19800.0,37620.0
+2026-06,Engineering,Salaries,expense,231000.0,240189.71
+2026-06,Engineering,Cloud Hosting,expense,52800.0,52268.83
+2026-06,Engineering,Contractors,expense,24200.0,23520.76
+2026-06,Engineering,Software Licenses,expense,13200.0,13856.75
+2026-06,G&A,Salaries,expense,77000.0,77073.35
+2026-06,G&A,Rent,expense,33000.0,31650.0
+2026-06,G&A,Software Licenses,expense,9900.0,9451.65

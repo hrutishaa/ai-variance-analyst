@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Variance Analyst · Budget vs Actuals</title>
+<meta name="description" content="Upload budget vs actuals and get variances, materiality flags, charts and plain-English commentary. Runs 100% in your browser.">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<header>
+  <div><h1>AI Variance Analyst</h1><p class="sub">Budget vs actuals → material variances → CFO-ready commentary. Runs entirely in your browser; your data never leaves this page.</p></div>
+  <a class="gh" href="https://github.com/hrutishaa/ai-variance-analyst">View code on GitHub</a>
+</header>
+<section class="controls">
+  <label class="btn">Upload CSV<input id="file" type="file" accept=".csv" hidden></label>
+  <button id="sample" class="btn secondary">Load sample (SaaS co, H1 2026)</button>
+  <label>Materiality %<input id="pct" type="number" value="10" min="0" step="1"></label>
+  <label>Materiality $<input id="abs" type="number" value="5000" min="0" step="500"></label>
+  <label>Department<select id="dept"><option value="">All</option></select></label>
+  <label class="chk"><input id="onlyMat" type="checkbox"> Material only</label>
+  <span class="hint">CSV columns: month, department, account, account_type (revenue|expense), budget, actual</span>
+</section>
+<div id="err" class="err" hidden></div>
+<section id="kpis" class="kpis"></section>
+<section class="grid">
+  <div class="card"><h3>Net profit impact by department</h3><canvas id="deptChart"></canvas></div>
+  <div class="card"><h3>Monthly operating profit: budget vs actual</h3><canvas id="monthChart"></canvas></div>
+</section>
+<section class="card"><h3>Variance commentary <button id="copy" class="mini">Copy</button></h3><div id="commentary" class="commentary"></div></section>
+<section class="card"><h3>Variance detail <span class="hint">(click a column to sort)</span></h3>
+  <div class="tablewrap"><table id="tbl"><thead><tr>
+    <th data-k="month">Month</th><th data-k="department">Dept</th><th data-k="account">Account</th><th data-k="account_type">Type</th>
+    <th data-k="budget" class="num">Budget</th><th data-k="actual" class="num">Actual</th><th data-k="variance" class="num">Var $</th><th data-k="variance_pct" class="num">Var %</th><th data-k="favorable">F/U</th><th data-k="material">Material</th>
+  </tr></thead><tbody></tbody></table></div></section>
+<footer>Same logic as the tested Python package (<code>variance_analyst</code>). Commentary here is rule-based and deterministic; the Python package can optionally polish it with an LLM grounded on these facts. MIT © 2026 Hrutishaa Nanduti</footer>
+<script src="app.js"></script>
+</body></html>

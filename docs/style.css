@@ -1,0 +1,18 @@
+:root{--bg:#0b1020;--card:#131a2e;--ink:#e7ecf7;--mut:#93a0bd;--acc:#5b8cff;--good:#2ecc8f;--bad:#ff6b6b;--line:#24304d}
+*{box-sizing:border-box}body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:24px;max-width:1280px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}h1{margin:0;font-size:28px}.sub{color:var(--mut);margin:4px 0 0}
+.gh{color:var(--acc);text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:8px}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin:20px 0}.controls label{display:flex;flex-direction:column;color:var(--mut);font-size:12px}
+.controls label.chk{flex-direction:row;align-items:center;gap:6px}
+input[type=number],select{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px;width:120px}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:9px 14px;cursor:pointer;font-weight:600;font-size:14px}.btn.secondary{background:transparent;border:1px solid var(--acc);color:var(--acc)}
+.hint{color:var(--mut);font-size:12px;font-weight:400}.err{background:#3b1520;color:#ffb3b3;padding:10px;border-radius:8px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.kpi .l{color:var(--mut);font-size:12px}.kpi .v{font-size:22px;font-weight:700}.kpi .d{font-size:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}.card h3{margin:0 0 10px;font-size:15px}
+.commentary{white-space:pre-wrap;line-height:1.6}.mini{float:right;background:transparent;border:1px solid var(--line);color:var(--mut);border-radius:6px;cursor:pointer}
+.tablewrap{max-height:460px;overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+th{position:sticky;top:0;background:var(--card);cursor:pointer;user-select:none}th:hover{color:var(--acc)}.num{text-align:right}
+.good{color:var(--good)}.bad{color:var(--bad)}tr.mat td{background:rgba(255,190,60,.07)}.tag{font-size:11px;padding:1px 6px;border-radius:10px;background:#3a2f12;color:#ffcf6b}
+footer{color:var(--mut);font-size:12px;margin-top:20px}
