@@ -12,6 +12,7 @@ import os
 import urllib.request
 
 from .core import VarianceLine, rollup, summarize
+from .runrate import DEFAULT_MIN_MONTHS, RUN_RATE, TIMING, detect_run_rate
 
 DRIVER_HINTS = {
     "salaries": "headcount timing (hires landing earlier/later than plan) or merit/bonus accruals",
@@ -54,7 +55,36 @@ def explain_line(l: VarianceLine) -> str:
             f"({pct}), {tone}. Likely driver: {likely_driver(l.account)}.")
 
 
-def rule_based_commentary(lines: list[VarianceLine], top_n: int = 5) -> str:
+def run_rate_section(lines: list[VarianceLine], min_months: int = DEFAULT_MIN_MONTHS, top_n: int = 5) -> str:
+    """Run-rate vs timing paragraph. Empty when there are fewer months than min_months to compare."""
+    if len({l.month for l in lines}) < min_months:
+        return ""
+    patterns = detect_run_rate(lines, min_months)
+    latest = max(l.month for l in lines)
+    run_rate = [p for p in patterns if p.pattern == RUN_RATE]
+    timing = [p for p in patterns if p.pattern == TIMING]
+    out = [f"Run-rate vs timing (material in the same direction for {min_months}+ consecutive months "
+           f"through {latest}):"]
+    for p in run_rate[:top_n]:
+        tone = "favorable" if p.favorable else "unfavorable"
+        out.append(f"- {p.department} {p.account}: {tone} for {p.streak} months running "
+                   f"({p.streak_months[0]} to {p.streak_months[-1]}, {fmt_money(abs(p.streak_variance))} cumulative); "
+                   "likely run-rate, consider re-forecast.")
+    if not run_rate:
+        out.append("- No run-rate variances; no material variance has repeated through the latest month.")
+    reversed_ = [p for p in timing if p.streak == 0]
+    fresh = [p for p in timing if p.streak > 0]
+    if reversed_:
+        names = ", ".join(f"{p.department} {p.account} ({p.last_material_month})" for p in reversed_[:top_n])
+        out.append(f"- Timing (did not repeat): {names}. Likely phasing; confirm with budget owners.")
+    if fresh:
+        names = ", ".join(f"{p.department} {p.account}" for p in fresh[:top_n])
+        out.append(f"- New in {latest}: {names}. Watch next month; a repeat makes it run-rate.")
+    return "\n".join(out)
+
+
+def rule_based_commentary(lines: list[VarianceLine], top_n: int = 5,
+                          run_rate_months: int = DEFAULT_MIN_MONTHS) -> str:
     s = summarize(lines)
     pv = s["profit_variance"]
     head = (f"Operating profit was {fmt_money(s['profit_actual'])} vs budget {fmt_money(s['profit_budget'])}, "
@@ -68,15 +98,18 @@ def rule_based_commentary(lines: list[VarianceLine], top_n: int = 5) -> str:
     worst, best = depts[0], depts[-1]
     close = (f"By department, {worst['department']} had the largest net drag on profit ({fmt_money(worst['net_impact'])}) "
              f"and {best['department']} the largest net help ({fmt_money(best['net_impact'])}). "
-             "Recommended follow-ups: confirm timing vs permanent items with budget owners, and re-forecast lines "
-             "whose variance repeats for 2+ months.")
-    return f"{head}\n\nTop material variances:\n{bullets}\n\n{close}"
+             "Recommended follow-ups: confirm timing items with budget owners, and re-forecast lines "
+             f"whose variance repeats for {run_rate_months}+ months.")
+    runs = run_rate_section(lines, run_rate_months, top_n)
+    runs = f"\n\n{runs}" if runs else ""
+    return f"{head}\n\nTop material variances:\n{bullets}{runs}\n\n{close}"
 
 
-def llm_commentary(lines: list[VarianceLine], model: str = "gpt-4o-mini") -> str:  # pragma: no cover - network
+def llm_commentary(lines: list[VarianceLine], model: str = "gpt-4o-mini",
+                   run_rate_months: int = DEFAULT_MIN_MONTHS) -> str:  # pragma: no cover - network
     key = os.environ["OPENAI_API_KEY"]
     base = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
-    facts = rule_based_commentary(lines)
+    facts = rule_based_commentary(lines, run_rate_months=run_rate_months)
     body = {
         "model": model,
         "messages": [
@@ -92,10 +125,11 @@ def llm_commentary(lines: list[VarianceLine], model: str = "gpt-4o-mini") -> str
         return json.load(resp)["choices"][0]["message"]["content"]
 
 
-def generate_commentary(lines: list[VarianceLine], use_llm: bool = False) -> str:
+def generate_commentary(lines: list[VarianceLine], use_llm: bool = False,
+                        run_rate_months: int = DEFAULT_MIN_MONTHS) -> str:
     if use_llm and os.environ.get("OPENAI_API_KEY"):
         try:
-            return llm_commentary(lines)
+            return llm_commentary(lines, run_rate_months=run_rate_months)
         except Exception:  # fall back, never fail the report
             pass
-    return rule_based_commentary(lines)
+    return rule_based_commentary(lines, run_rate_months=run_rate_months)

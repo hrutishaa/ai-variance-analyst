@@ -7,9 +7,11 @@
 - [x] CLI, pytest suite, CI on Python 3.10–3.12
 - [x] Live in-browser demo on GitHub Pages (upload CSV, thresholds, charts, sortable table)
 
+## v0.2: Run-rate detection ✅
+- [x] Run-rate detection: flag variances that stay material in the same direction for 2+ consecutive months (configurable) as "run-rate" vs one-off "timing", with streak length, in the package, CLI, commentary and web demo
+
 ## Next
 - [ ] Price / volume / mix decomposition for revenue lines (needs units + price columns)
-- [ ] Run-rate detection: flag variances that repeat for 2+ months as "permanent" vs "timing"
 - [ ] Rolling forecast suggestion: re-forecast remaining months from the YTD trend
 - [ ] Export commentary + table to Excel / PowerPoint for the monthly business review
 - [ ] Bring-your-own-key LLM mode in the web demo (key kept only in browser memory)

@@ -53,7 +53,7 @@ month,department,account,account_type,budget,actual
 2026-04,Marketing,Salaries,expense,63600.0,61752.46
 2026-04,Marketing,Events,expense,19100.0,18654.93
 2026-04,Engineering,Salaries,expense,222600.0,195888.0
-2026-04,Engineering,Cloud Hosting,expense,50900.0,51653.5
+2026-04,Engineering,Cloud Hosting,expense,50900.0,64125.6
 2026-04,Engineering,Contractors,expense,23300.0,23554.28
 2026-04,Engineering,Software Licenses,expense,12700.0,12282.35
 2026-04,G&A,Salaries,expense,74200.0,75900.12
@@ -68,13 +68,13 @@ month,department,account,account_type,budget,actual
 2026-05,Marketing,Salaries,expense,64800.0,63044.23
 2026-05,Marketing,Events,expense,19400.0,18492.27
 2026-05,Engineering,Salaries,expense,226800.0,222614.48
-2026-05,Engineering,Cloud Hosting,expense,51800.0,50596.9
+2026-05,Engineering,Cloud Hosting,expense,51800.0,64232.0
 2026-05,Engineering,Contractors,expense,23800.0,23112.14
 2026-05,Engineering,Software Licenses,expense,13000.0,13575.78
 2026-05,G&A,Salaries,expense,75600.0,78445.34
 2026-05,G&A,Rent,expense,32400.0,31799.56
 2026-05,G&A,Software Licenses,expense,9700.0,9850.78
-2026-06,Sales,Subscription Revenue,revenue,924000.0,914356.38
+2026-06,Sales,Subscription Revenue,revenue,924000.0,813120.0
 2026-06,Sales,Professional Services Revenue,revenue,128700.0,173745.00
 2026-06,Sales,Salaries,expense,165000.0,164321.06
 2026-06,Sales,Commissions,expense,41800.0,40817.2
@@ -83,7 +83,7 @@ month,department,account,account_type,budget,actual
 2026-06,Marketing,Salaries,expense,66000.0,64434.09
 2026-06,Marketing,Events,expense,19800.0,37620.0
 2026-06,Engineering,Salaries,expense,231000.0,240189.71
-2026-06,Engineering,Cloud Hosting,expense,52800.0,52268.83
+2026-06,Engineering,Cloud Hosting,expense,52800.0,63888.0
 2026-06,Engineering,Contractors,expense,24200.0,23520.76
 2026-06,Engineering,Software Licenses,expense,13200.0,13856.75
 2026-06,G&A,Salaries,expense,77000.0,77073.35
