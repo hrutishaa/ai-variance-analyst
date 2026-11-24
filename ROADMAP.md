@@ -10,8 +10,10 @@
 ## v0.2: Run-rate detection ✅
 - [x] Run-rate detection: flag variances that stay material in the same direction for 2+ consecutive months (configurable) as "run-rate" vs one-off "timing", with streak length, in the package, CLI, commentary and web demo
 
+## v0.3: Price / volume / mix ✅
+- [x] Price / volume / mix decomposition for revenue lines (optional `budget_units` / `actual_units` columns; price = $ / units), exact bridge (price + volume + mix = variance), in the package, commentary, CLI and web demo (bridge chart + product table), with a product-level sample
+
 ## Next
-- [ ] Price / volume / mix decomposition for revenue lines (needs units + price columns)
 - [ ] Rolling forecast suggestion: re-forecast remaining months from the YTD trend
 - [ ] Export commentary + table to Excel / PowerPoint for the monthly business review
 - [ ] Bring-your-own-key LLM mode in the web demo (key kept only in browser memory)

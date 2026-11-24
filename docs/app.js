@@ -1,4 +1,4 @@
-// Mirrors variance_analyst/core.py + runrate.py + commentary.py (keep in sync; covered by Python tests).
+// Mirrors variance_analyst/core.py + runrate.py + commentary.py (+ pvm.py via pvm.js) (keep in sync; covered by Python tests).
 const REQ = ["month","department","account","account_type","budget","actual"];
 const DRIVERS = {salaries:"headcount timing (hires landing earlier/later than plan) or merit/bonus accruals",
   contractors:"use of contractors to backfill open roles or accelerate projects",cloud:"usage growth, untagged resources, or reserved-instance coverage gaps",
@@ -22,10 +22,18 @@ function parseCSV(text){
 function load(text){
   const t=parseCSV(text); const hdr=t[0].map(h=>h.trim().toLowerCase());
   const miss=REQ.filter(c=>!hdr.includes(c)); if(miss.length) throw new Error("CSV is missing required columns: "+miss.join(", "));
+  const hu=["budget_units","actual_units"].map(c=>hdr.includes(c)); if(hu[0]!==hu[1]) throw new Error("unit columns come as a pair: add both budget_units and actual_units, or neither");
   return t.slice(1).map((r,i)=>{const o={}; hdr.forEach((h,j)=>o[h]=(r[j]||"").trim());
     o.account_type=o.account_type.toLowerCase(); if(!["revenue","expense"].includes(o.account_type)) throw new Error(`line ${i+2}: account_type must be revenue or expense`);
     o.budget=parseFloat(o.budget.replace(/,/g,"")); o.actual=parseFloat(o.actual.replace(/,/g,""));
-    if(isNaN(o.budget)||isNaN(o.actual)) throw new Error(`line ${i+2}: budget/actual must be numeric`); return o;});
+    if(isNaN(o.budget)||isNaN(o.actual)) throw new Error(`line ${i+2}: budget/actual must be numeric`);
+    const bu=hu[0]?o.budget_units:"", au=hu[0]?o.actual_units:"";
+    if(!bu&&!au){o.budget_units=null;o.actual_units=null;}
+    else { if(!bu||!au) throw new Error(`line ${i+2}: fill both budget_units and actual_units, or leave both blank`);
+      o.budget_units=Number(bu.replace(/,/g,"")); o.actual_units=Number(au.replace(/,/g,""));
+      if(isNaN(o.budget_units)||isNaN(o.actual_units)) throw new Error(`line ${i+2}: budget_units/actual_units must be numeric`);
+      if(o.budget_units<0||o.actual_units<0) throw new Error(`line ${i+2}: units cannot be negative`); }
+    return o;});
 }
 function compute(rows,pct,abs){
   return rows.map(r=>{const v=r.actual-r.budget, p=r.budget===0?null:v/Math.abs(r.budget);
@@ -73,7 +81,18 @@ function runRateSection(ls,n){
   if(rev.length) out.push(`• Timing (did not repeat): ${rev.slice(0,5).map(p=>`${p.department} ${p.account} (${p.last_material_month})`).join(", ")}. Likely phasing; confirm with budget owners.`);
   if(fresh.length) out.push(`• New in ${latest}: ${fresh.slice(0,5).map(p=>`${p.department} ${p.account}`).join(", ")}. Watch next month; a repeat makes it run-rate.`);
   return out.join("\n");}
-function commentary(ls,n){
+const signed=x=>Math.round(x)===0?"$0":(x>0?"+":"")+money(x);
+const price2=x=>"$"+x.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+function pvmDetail(g){const e={price:g.price_effect,volume:g.volume_effect,mix:g.mix_effect};
+  const big=Object.keys(e).reduce((a,k)=>Math.abs(e[k])>Math.abs(e[a])?k:a,"price"), top=k=>g.products.reduce((a,p)=>Math.abs(p[k])>Math.abs(a[k])?p:a);
+  let why; if(big==="price"){const p=top("price_effect"); why=`${p.account} averaged ${price2(p.actual_price)} per unit vs ${price2(p.budget_price)} budget`;}
+  else if(big==="volume") why=`${Math.round(g.actual_units).toLocaleString()} units sold vs ${Math.round(g.budget_units).toLocaleString()} budget`;
+  else {const p=top("mix_effect"); why=`${p.account} was ${Math.round(100*(g.actual_units?p.actual_units/g.actual_units:0))}% of units vs ${Math.round(100*(g.budget_units?p.budget_units/g.budget_units:0))}% in budget`;}
+  return `Largest effect: ${big} (${why}).`;}
+function pvmSection(groups){ if(!groups.length) return "";
+  return [`Price / volume / mix (revenue lines with units, ${groups[0].period}):`].concat(groups.slice(0,5).map(g=>
+    `• ${g.department}: revenue ${money(g.actual)} vs budget ${money(g.budget)} (${signed(g.variance)}). Price ${signed(g.price_effect)}, volume ${signed(g.volume_effect)}, mix ${signed(g.mix_effect)}. ${pvmDetail(g)}`)).join("\n");}
+function commentary(ls,n,pvm){
   const s=summarize(ls);
   let t=`Operating profit was ${money(s.pa)} vs budget ${money(s.pb)}, ${s.pv>=0?"a favorable":"an unfavorable"} variance of ${money(Math.abs(s.pv))}. `+
     `Revenue landed at ${money(s.ra)} (${money(s.ra-s.rb)} vs plan) and expenses at ${money(s.ea)} (${money(s.ea-s.eb)} vs plan). `+
@@ -81,6 +100,7 @@ function commentary(ls,n){
   const top=ls.filter(l=>l.material).sort((a,b)=>Math.abs(b.variance)-Math.abs(a.variance)).slice(0,5);
   t+= top.length? top.map(l=>`• ${l.department} ${l.account} (${l.month}) came in ${money(Math.abs(l.variance))} ${l.variance>0?"over":"under"} budget (${pctf(l.variance_pct)}), ${l.favorable?"favorable":"unfavorable"}. Likely driver: ${driver(l.account)}.`).join("\n") : "• No material variances.";
   const rrs=runRateSection(ls,n); if(rrs) t+="\n\n"+rrs;
+  const pv=pvmSection(pvm||[]); if(pv) t+="\n\n"+pv;
   const d=rollup(ls,"department"); if(d.length){const w=d[0],b=d[d.length-1];
   t+=`\n\nBy department, ${w.key} had the largest net drag on profit (${money(w.net)}) and ${b.key} the largest net help (${money(b.net)}). Recommended follow-ups: confirm timing items with budget owners, and re-forecast lines whose variance repeats for ${n}+ months.`;}
   return t;
@@ -96,13 +116,29 @@ function render(){
   $("kpis").innerHTML=k("Revenue (actual)",money(s.ra),`${money(s.ra-s.rb)} vs budget`,s.ra>=s.rb)+k("Expenses (actual)",money(s.ea),`${money(s.ea-s.eb)} vs budget`,s.ea<=s.eb)+
     k("Operating profit",money(s.pa),`${money(s.pv)} vs budget`,s.pv>=0)+k("Material variances",s.mat,`of ${s.n} lines`)+
     k("Run-rate items",rrCount,`material ${n}+ months running`,rrCount===0);
-  $("commentary").textContent=commentary(lines,n);
+  const pvm=decomposePVM(lines,false);
+  $("commentary").textContent=commentary(lines,n,pvm);
+  renderPVM(pvm);
   const d=rollup(lines,"department");
   draw("deptChart",{type:"bar",data:{labels:d.map(x=>x.key),datasets:[{label:"Net profit impact ($)",data:d.map(x=>Math.round(x.net)),backgroundColor:d.map(x=>x.net>=0?"#2ecc8f":"#ff6b6b")}]},options:{indexAxis:"y",plugins:{legend:{display:false}}}});
   const months=[...new Set(lines.map(l=>l.month))].sort();
   const prof=(m,k)=>lines.filter(l=>l.month===m).reduce((a,l)=>a+(l.account_type==="revenue"?l[k]:-l[k]),0);
   draw("monthChart",{type:"line",data:{labels:months,datasets:[{label:"Budget",data:months.map(m=>prof(m,"budget")),borderColor:"#93a0bd",borderDash:[5,5]},{label:"Actual",data:months.map(m=>prof(m,"actual")),borderColor:"#5b8cff",backgroundColor:"#5b8cff"}]}});
   table();
+}
+function renderPVM(groups){
+  $("pvmCard").hidden=!groups.length; if(!groups.length){ if(charts.pvmChart){charts.pvmChart.destroy();delete charts.pvmChart;} return; }
+  $("pvmPeriod").textContent=groups[0].period;
+  const tot=k=>groups.reduce((a,g)=>a+g[k],0), b=tot("budget"), steps=[["Price",tot("price_effect")],["Volume",tot("volume_effect")],["Mix",tot("mix_effect")]];
+  let run=b; const bars=[[0,b]].concat(steps.map(([,v])=>{const bar=[run,run+v]; run+=v; return bar;})).concat([[0,tot("actual")]]);
+  const pts=bars.flat().filter(v=>v!==0), lo=Math.min(...pts), hi=Math.max(...pts), yMin=Math.max(0,Math.floor(lo-Math.max((hi-lo)*0.5,Math.abs(lo)*0.01)));
+  draw("pvmChart",{type:"bar",data:{labels:["Budget revenue"].concat(steps.map(s=>s[0])).concat(["Actual revenue"]),
+    datasets:[{label:"$",data:bars,backgroundColor:["#93a0bd"].concat(steps.map(([,v])=>v>=0?"#2ecc8f":"#ff6b6b")).concat(["#5b8cff"])}]},
+    options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const [x,y]=c.raw;return c.dataIndex===0||c.dataIndex===4?money(y):signed(y-x);}}}},scales:{y:{min:yMin}}}});
+  const cell=(v)=>`<td class="num ${v>=0?"good":"bad"}">${signed(v)}</td>`;
+  document.querySelector("#pvmTbl tbody").innerHTML=groups.map(g=>
+    `<tr class="grp"><td>${esc(g.department)}</td><td class="num">${Math.round(g.budget_units).toLocaleString()} → ${Math.round(g.actual_units).toLocaleString()}</td><td></td><td class="num">${money(g.budget)}</td>${cell(g.price_effect)}${cell(g.volume_effect)}${cell(g.mix_effect)}<td class="num">${money(g.actual)}</td></tr>`+
+    g.products.map(p=>`<tr><td class="ind">${esc(p.account)}</td><td class="num">${Math.round(p.budget_units).toLocaleString()} → ${Math.round(p.actual_units).toLocaleString()}</td><td class="num">${price2(p.budget_price)} → ${price2(p.actual_price)}</td><td class="num">${money(p.budget)}</td>${cell(p.price_effect)}${cell(p.volume_effect)}${cell(p.mix_effect)}<td class="num">${money(p.actual)}</td></tr>`).join("")).join("");
 }
 function draw(id,cfg){ if(!window.Chart) return; Chart.defaults.color="#93a0bd"; Chart.defaults.borderColor="#24304d"; if(charts[id]) charts[id].destroy(); charts[id]=new Chart($(id),cfg);}
 function table(){
@@ -120,9 +156,10 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 function setData(text){ try{ rows=load(text); const ds=[...new Set(rows.map(r=>r.department))].sort();
   $("dept").innerHTML='<option value="">All</option>'+ds.map(d=>`<option>${esc(d)}</option>`).join(""); render(); }
   catch(e){ $("err").textContent=e.message; $("err").hidden=false; } }
-document.querySelectorAll("th").forEach(th=>th.onclick=()=>{const k=th.dataset.k; sortDir=sortKey===k?-sortDir:1; sortKey=k; table();});
+document.querySelectorAll("#tbl th").forEach(th=>th.onclick=()=>{const k=th.dataset.k; sortDir=sortKey===k?-sortDir:1; sortKey=k; table();});
 ["pct","abs","dept","runN"].forEach(id=>$(id).oninput=render); $("onlyMat").onchange=table;
 $("file").onchange=e=>{const f=e.target.files[0]; if(f) f.text().then(setData);};
 $("sample").onclick=()=>fetch("sample.csv").then(r=>r.text()).then(setData);
+$("samplePvm").onclick=()=>fetch("sample_pvm.csv").then(r=>r.text()).then(setData);
 $("copy").onclick=()=>navigator.clipboard.writeText($("commentary").textContent);
 fetch("sample.csv").then(r=>r.text()).then(setData);

@@ -21,4 +21,8 @@ jobs:
       - name: Smoke-test CLI on sample data
         run: python -m variance_analyst data/sample_budget_vs_actuals.csv
       - name: Web demo uses the same sample data
-        run: cmp data/sample_budget_vs_actuals.csv docs/sample.csv
+        run: |
+          cmp data/sample_budget_vs_actuals.csv docs/sample.csv
+          cmp data/sample_revenue_pvm.csv docs/sample_pvm.csv
+      - name: Smoke-test price / volume / mix on the PVM sample
+        run: python -m variance_analyst data/sample_revenue_pvm.csv | grep "Price / volume / mix"

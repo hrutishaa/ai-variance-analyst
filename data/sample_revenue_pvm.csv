@@ -1,0 +1,37 @@
+month,department,account,account_type,budget,actual,budget_units,actual_units
+2026-01,Subscriptions,Starter Plan,revenue,98000.00,100450.00,2000,2050
+2026-01,Subscriptions,Pro Plan,revenue,118800.00,117810.00,1200,1190
+2026-01,Subscriptions,Enterprise Plan,revenue,74700.00,73704.00,300,296
+2026-01,Services,Implementation,revenue,72000.00,74100.00,400,380
+2026-01,Operations,Cloud Hosting,expense,42000.00,41800.00,,
+2026-01,Operations,Customer Support Salaries,expense,60000.00,59000.00,,
+2026-02,Subscriptions,Starter Plan,revenue,102900.00,109760.00,2100,2240
+2026-02,Subscriptions,Pro Plan,revenue,124740.00,124245.00,1260,1255
+2026-02,Subscriptions,Enterprise Plan,revenue,78435.00,75945.00,315,305
+2026-02,Services,Implementation,revenue,75600.00,78000.00,420,400
+2026-02,Operations,Cloud Hosting,expense,43000.00,44100.00,,
+2026-02,Operations,Customer Support Salaries,expense,60000.00,60500.00,,
+2026-03,Subscriptions,Starter Plan,revenue,107800.00,118090.00,2200,2410
+2026-03,Subscriptions,Pro Plan,revenue,130680.00,128700.00,1320,1300
+2026-03,Subscriptions,Enterprise Plan,revenue,82170.00,80136.00,330,318
+2026-03,Services,Implementation,revenue,79200.00,70200.00,440,360
+2026-03,Operations,Cloud Hosting,expense,44000.00,46900.00,,
+2026-03,Operations,Customer Support Salaries,expense,60000.00,61200.00,,
+2026-04,Subscriptions,Starter Plan,revenue,112700.00,127400.00,2300,2600
+2026-04,Subscriptions,Pro Plan,revenue,136620.00,124155.00,1380,1395
+2026-04,Subscriptions,Enterprise Plan,revenue,85905.00,81144.00,345,322
+2026-04,Services,Implementation,revenue,82800.00,79950.00,460,410
+2026-04,Operations,Cloud Hosting,expense,45000.00,48200.00,,
+2026-04,Operations,Customer Support Salaries,expense,60000.00,60100.00,,
+2026-05,Subscriptions,Starter Plan,revenue,117600.00,136710.00,2400,2790
+2026-05,Subscriptions,Pro Plan,revenue,142560.00,130830.00,1440,1470
+2026-05,Subscriptions,Enterprise Plan,revenue,89640.00,83412.00,360,331
+2026-05,Services,Implementation,revenue,86400.00,83850.00,480,430
+2026-05,Operations,Cloud Hosting,expense,46000.00,49500.00,,
+2026-05,Operations,Customer Support Salaries,expense,60000.00,66800.00,,
+2026-06,Subscriptions,Starter Plan,revenue,122500.00,146020.00,2500,2980
+2026-06,Subscriptions,Pro Plan,revenue,148500.00,137060.00,1500,1540
+2026-06,Subscriptions,Enterprise Plan,revenue,93375.00,85680.00,375,340
+2026-06,Services,Implementation,revenue,90000.00,81900.00,500,420
+2026-06,Operations,Cloud Hosting,expense,47000.00,50800.00,,
+2026-06,Operations,Customer Support Salaries,expense,60000.00,67200.00,,

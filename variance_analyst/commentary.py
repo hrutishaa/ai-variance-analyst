@@ -12,6 +12,7 @@ import os
 import urllib.request
 
 from .core import VarianceLine, rollup, summarize
+from .pvm import PVMGroup, decompose_pvm
 from .runrate import DEFAULT_MIN_MONTHS, RUN_RATE, TIMING, detect_run_rate
 
 DRIVER_HINTS = {
@@ -37,6 +38,40 @@ def fmt_money(x: float) -> str:
     if x >= 1_000:
         return f"{sign}${x/1_000:.1f}K"
     return f"{sign}${x:,.0f}"
+
+
+def fmt_signed(x: float) -> str:
+    """fmt_money with an explicit + for positive amounts (bridge-style)."""
+    return ("+" if x > 0 else "") + fmt_money(x) if round(x) != 0 else "$0"
+
+
+def _pvm_detail(g: PVMGroup) -> str:
+    effects = {"price": g.price_effect, "volume": g.volume_effect, "mix": g.mix_effect}
+    biggest = max(effects, key=lambda k: abs(effects[k]))
+    if biggest == "price":
+        p = max(g.products, key=lambda p: abs(p.price_effect))
+        why = f"{p.account} averaged ${p.actual_price:,.2f} per unit vs ${p.budget_price:,.2f} budget"
+    elif biggest == "volume":
+        why = f"{g.actual_units:,.0f} units sold vs {g.budget_units:,.0f} budget"
+    else:
+        p = max(g.products, key=lambda p: abs(p.mix_effect))
+        a_share = p.actual_units / g.actual_units if g.actual_units else 0.0
+        b_share = p.budget_units / g.budget_units if g.budget_units else 0.0
+        why = f"{p.account} was {a_share:.0%} of units vs {b_share:.0%} in budget"
+    return f"Largest effect: {biggest} ({why})."
+
+
+def pvm_section(lines: list[VarianceLine], top_n: int = 5) -> str:
+    """Price / volume / mix paragraph for revenue lines with units. Empty when there are none."""
+    groups = decompose_pvm(lines)
+    if not groups:
+        return ""
+    out = [f"Price / volume / mix (revenue lines with units, {groups[0].period}):"]
+    for g in groups[:top_n]:
+        out.append(f"- {g.department}: revenue {fmt_money(g.actual)} vs budget {fmt_money(g.budget)} "
+                   f"({fmt_signed(g.variance)}). Price {fmt_signed(g.price_effect)}, volume "
+                   f"{fmt_signed(g.volume_effect)}, mix {fmt_signed(g.mix_effect)}. {_pvm_detail(g)}")
+    return "\n".join(out)
 
 
 def likely_driver(account: str) -> str:
@@ -102,7 +137,9 @@ def rule_based_commentary(lines: list[VarianceLine], top_n: int = 5,
              f"whose variance repeats for {run_rate_months}+ months.")
     runs = run_rate_section(lines, run_rate_months, top_n)
     runs = f"\n\n{runs}" if runs else ""
-    return f"{head}\n\nTop material variances:\n{bullets}{runs}\n\n{close}"
+    pvm = pvm_section(lines, top_n)
+    pvm = f"\n\n{pvm}" if pvm else ""
+    return f"{head}\n\nTop material variances:\n{bullets}{runs}{pvm}\n\n{close}"
 
 
 def llm_commentary(lines: list[VarianceLine], model: str = "gpt-4o-mini",

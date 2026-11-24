@@ -9,6 +9,8 @@ from typing import Iterable
 
 REQUIRED_COLUMNS = {"month", "department", "account", "account_type", "budget", "actual"}
 VALID_TYPES = {"revenue", "expense"}
+# Optional: unit volumes for price / volume / mix decomposition (see pvm.py). Both or neither.
+UNIT_COLUMNS = ("budget_units", "actual_units")
 
 
 @dataclass(frozen=True)
@@ -23,6 +25,8 @@ class VarianceLine:
     variance_pct: float | None  # variance / |budget|, None when budget == 0
     favorable: bool
     material: bool
+    budget_units: float | None = None  # optional, only when the CSV has unit columns
+    actual_units: float | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -33,6 +37,9 @@ def _parse_rows(reader: csv.DictReader) -> list[dict]:
     missing = REQUIRED_COLUMNS - cols
     if missing:
         raise ValueError(f"CSV is missing required columns: {sorted(missing)}")
+    has_units = [c in cols for c in UNIT_COLUMNS]
+    if any(has_units) and not all(has_units):
+        raise ValueError("unit columns come as a pair: add both budget_units and actual_units, or neither")
     rows = []
     for i, raw in enumerate(reader, start=2):
         row = {k.strip().lower(): (v or "").strip() for k, v in raw.items() if k}
@@ -44,8 +51,25 @@ def _parse_rows(reader: csv.DictReader) -> list[dict]:
             actual = float(row["actual"].replace(",", ""))
         except ValueError as exc:
             raise ValueError(f"line {i}: budget/actual must be numeric") from exc
-        rows.append({**row, "account_type": atype, "budget": budget, "actual": actual})
+        units = _parse_units(row, i) if all(has_units) else {}
+        rows.append({**row, "account_type": atype, "budget": budget, "actual": actual, **units})
     return rows
+
+
+def _parse_units(row: dict, line_no: int) -> dict:
+    """Parse the optional unit columns. Both blank -> no units for this row (e.g. expense lines)."""
+    raw = [row.get(c, "") for c in UNIT_COLUMNS]
+    if not any(raw):
+        return {c: None for c in UNIT_COLUMNS}
+    if not all(raw):
+        raise ValueError(f"line {line_no}: fill both budget_units and actual_units, or leave both blank")
+    try:
+        vals = [float(v.replace(",", "")) for v in raw]
+    except ValueError as exc:
+        raise ValueError(f"line {line_no}: budget_units/actual_units must be numeric") from exc
+    if any(v < 0 for v in vals):
+        raise ValueError(f"line {line_no}: units cannot be negative")
+    return dict(zip(UNIT_COLUMNS, vals))
 
 
 def load_csv(source: str | Path | io.TextIOBase) -> list[dict]:
@@ -75,7 +99,8 @@ def compute_variances(
         pct_hit = pct is None and var != 0 or (pct is not None and abs(pct) >= pct_threshold)
         material = bool(pct_hit and abs(var) >= abs_threshold)
         out.append(VarianceLine(r["month"], r["department"], r["account"], r["account_type"],
-                                r["budget"], r["actual"], var, pct, favorable, material))
+                                r["budget"], r["actual"], var, pct, favorable, material,
+                                r.get("budget_units"), r.get("actual_units")))
     return out
 
 

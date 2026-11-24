@@ -17,3 +17,5 @@ th{position:sticky;top:0;background:var(--card);cursor:pointer;user-select:none}
 .good{color:var(--good)}.bad{color:var(--bad)}tr.mat td{background:rgba(255,190,60,.07)}.tag{font-size:11px;padding:1px 6px;border-radius:10px;background:#3a2f12;color:#ffcf6b}
 footer{color:var(--mut);font-size:12px;margin-top:20px}
 .tag.rr{background:#3b1a2a;color:#ff9db8}.tag.tm{background:#16304a;color:#8cc4ff}
+#pvmTbl th{cursor:default}#pvmTbl tr.grp td{font-weight:700;border-top:1px solid var(--line)}#pvmTbl td.ind{padding-left:20px;color:var(--mut)}
+.pvmchart{max-width:720px;margin-bottom:12px}#pvmTbl td.num{white-space:nowrap}
